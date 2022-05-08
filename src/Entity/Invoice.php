@@ -2,13 +2,24 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter; // ordonner nos résultats  ("amount" & "sentAt")
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\InvoiceRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=InvoiceRepository::class)
- * @ApiResource()
+ * @ApiResource(
+ *     attributes={
+ *         "pagination_enabled"=true,
+ *         "pagination_items_per_page"=40,
+ *         "order"={"amount": "desc"}
+ *     }
+ * )
+ * @ApiFilter(OrderFilter::class, properties={"amount", "sentAt"})
+ * @ApiFilter(SearchFilter::class, properties={"customer.firstName": "partial", "customer.lastName": "partial", "sentAt": "partial"})
  */
 class Invoice
 {
