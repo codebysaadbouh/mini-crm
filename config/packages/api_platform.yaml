@@ -1,19 +1,19 @@
 api_platform:
     # The title of the API.
-    title: 'API ORM'
+    title: 'API ORM - by saadbouh'
 
     # The description of the API.
     description: 'Learn the API platform function with Symfony by 
-                  creating a mini CRM (Customer & invoice management) '
+                  creating a mini CRM (Customer & invoice management)'
 
     collection:
         pagination:
             enabled: false # or true
-            items_per_page: 25
-            client_enabled: true # ?pagination=false
+            items_per_page: 25 # Items number per page
+            client_enabled: true # ?pagination=true
             client_items_per_page: true # ?items_per_page=10
             items_per_page_parameter_name: "count" # ?count=10
-            enabled_parameter_name: "pag" # ?/p=false
+            enabled_parameter_name: "pag" # ?/pag=false
 
 
     # The version of the API.

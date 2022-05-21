@@ -9,10 +9,15 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @ApiResource()
+ * @ApiResource(
+ *     normalizationContext={
+ *     "groups"={"user_read"}
+ *     }
+ * )
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -20,11 +25,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"costumers_read", "invoices_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Groups({"costumers_read", "invoices_read"})
      */
     private $email;
 
@@ -41,11 +48,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"costumers_read", "invoices_read"})
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"costumers_read", "invoices_read"})
      */
     private $lastName;
 
