@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter; // ordonner nos résultats  ("amount" & "sentAt")
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -15,6 +16,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass=CostumerRepository::class)
  * @ApiResource(
+ *     collectionOperations={"GET", "POST"},
+ *     itemOperations={"GET", "PUT", "DELETE"},
+ *     subresourceOperations={
+ *          "invoices_get_subresource"={"path"="/costumers/{id}/invoices"}
+ *     },
  *     normalizationContext={
  *         "groups"={"costumers_read"}
  *     }
@@ -59,6 +65,7 @@ class Costumer
     /**
      * @ORM\OneToMany(targetEntity=Invoice::class, mappedBy="costumer")
      * @Groups({"costumers_read"})
+     * @ApiSubresource
      */
     private $invoices;
 

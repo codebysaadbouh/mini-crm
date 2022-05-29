@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter; // ordonner nos résultats  ("amount" & "sentAt")
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use App\Controller\InvoiceIncrementationController;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\InvoiceRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -13,6 +14,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass=InvoiceRepository::class)
  * @ApiResource(
+ *     subresourceOperations={
+ *          "api_costumers_invoices_get_subresource"={
+ *              "normalization_context"={"groups"={"invoices_subresources"}}
+ *          }
+ *     },
  *     attributes={
  *         "pagination_enabled"=true,
  *         "pagination_items_per_page"=40,
@@ -20,6 +26,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     },
  *     normalizationContext={
  *         "groups"={"invoices_read"}
+ *     },
+ *     itemOperations={"GET","PUT", "DELETE","increment"={
+ *          "method"="POST",
+ *          "path"="/invoices/{id}/increment",
+ *          "controller"=InvoiceIncrementationController::class,
+ *          "openapi_context"={
+ *              "summary"="Incrémente une facture",
+ *              "description"="Incrémente le chrono d'une facture donnée"
+ *          }
+ *        }
  *     },
  * )
  * @ApiFilter(OrderFilter::class, properties={"amount", "sentAt"})
@@ -31,13 +47,13 @@ class Invoice
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"invoices_read", "costumers_read"})
+     * @Groups({"invoices_read", "costumers_read", "invoices_subresource"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="float")
-     * @Groups({"invoices_read", "costumers_read"})
+     * @Groups({"invoices_read", "costumers_read", "invoices_subresources"})
      */
     private $amount;
 
@@ -49,7 +65,7 @@ class Invoice
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"invoices_read", "costumers_read"})
+     * @Groups({"invoices_read", "costumers_read", "invoices_subresources"})
      */
     private $status;
 
@@ -62,7 +78,7 @@ class Invoice
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"invoices_read", "costumers_read"})
+     * @Groups({"invoices_read", "costumers_read", "invoices_subresources"})
      */
     private $chrono;
 
@@ -133,7 +149,7 @@ class Invoice
 
     /**
      * Permet de récupérer le USER à qui appartient l'invoice
-     * @Groups({"invoices_read"})
+     * @Groups({"invoices_read", "invoices_subresources"})
      * @return User
      */
     public function getUser() : User {
