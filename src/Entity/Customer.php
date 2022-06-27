@@ -7,71 +7,79 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter; // ordonner nos résultats  ("amount" & "sentAt")
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\CostumerRepository;
+use App\Repository\CustomerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass=CostumerRepository::class)
+ * @ORM\Entity(repositoryClass=CustomerRepository::class)
  * @ApiResource(
  *     collectionOperations={"GET", "POST"},
  *     itemOperations={"GET", "PUT", "DELETE"},
  *     subresourceOperations={
- *          "invoices_get_subresource"={"path"="/costumers/{id}/invoices"}
+ *          "invoices_get_subresource"={"path"="/customers/{id}/invoices"}
  *     },
  *     normalizationContext={
- *         "groups"={"costumers_read"}
+ *         "groups"={"customers_read"}
  *     }
  * )
  * @ApiFilter(SearchFilter::class, properties={"firstName":"partial", "lastName":"partial", "email":"partial"})
  * @ApiFilter(OrderFilter::class)
  */
-class Costumer
+class Customer
 {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"costumers_read", "invoices_read"})
+     * @Groups({"customers_read", "invoices_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"costumers_read", "invoices_read"})
+     * @Groups({"customers_read", "invoices_read"})
+     * @Assert\NotBlank(message="Le prénom est obligatoire")
+     * @Assert\Length(min=2, minMessage="Le Prénom doit faire au moins 2 caractères", max=255, maxMessage="Le Prénom ne peut pas faire plus de 255 caractères")
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"costumers_read", "invoices_read"})
+     * @Groups({"customers_read", "invoices_read"})
+     * @Assert\NotBlank(message="Le nom est obligatoire")
+     * @Assert\Length(min=2, minMessage="Le Nom doit faire au moins 2 caractères", max=255, maxMessage="Le Nom ne peut pas faire plus de 255 caractères")
      */
     private $lastName;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"costumers_read", "invoices_read"})
+     * @Groups({"customers_read", "invoices_read"})
+     * @Assert\NotBlank(message="L'email est obligatoire")
+     * @Assert\Email(message="Le format de l'email n'est pas valide")
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"costumers_read", "invoices_read"})
+     * @Groups({"customers_read", "invoices_read"})
      */
     private $company;
 
     /**
-     * @ORM\OneToMany(targetEntity=Invoice::class, mappedBy="costumer")
-     * @Groups({"costumers_read"})
+     * @ORM\OneToMany(targetEntity=Invoice::class, mappedBy="customer")
+     * @Groups({"customers_read"})
      * @ApiSubresource
      */
     private $invoices;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="costumers")
-     * @Groups({"costumers_read"})
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="customers")
+     * @Groups({"customers_read"})
+     * @Assert\NotBlank(message="L'utilisateur est obligatoire")
      */
     private $user;
 
@@ -82,7 +90,7 @@ class Costumer
 
     /**
      * Permet de récupérer le total des invoices
-     * @Groups({"costumers_read"})
+     * @Groups({"customers_read"})
      * @return float
      */
     public function getTotalAmount() : float
@@ -93,7 +101,7 @@ class Costumer
     }
     /**
      * Permet de récupérer le total nn payées des invoices
-     * @Groups({"costumers_read"})
+     * @Groups({"customers_read"})
      * @return float
      */
     public function getUnpaidAmount() : float {
@@ -167,7 +175,7 @@ class Costumer
     {
         if (!$this->invoices->contains($invoice)) {
             $this->invoices[] = $invoice;
-            $invoice->setCostumer($this);
+            $invoice->setCustomer($this);
         }
 
         return $this;
@@ -177,8 +185,8 @@ class Costumer
     {
         if ($this->invoices->removeElement($invoice)) {
             // set the owning side to null (unless already changed)
-            if ($invoice->getCostumer() === $this) {
-                $invoice->setCostumer(null);
+            if ($invoice->getCustomer() === $this) {
+                $invoice->setCustomer(null);
             }
         }
 
