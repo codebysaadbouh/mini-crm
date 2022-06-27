@@ -48,6 +48,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     *
      * @Assert\NotBlank(message="Le mot de passe est obligatoire")
      * @Assert\Length(min=8, minMessage="Le mot de passe doit faire au moins 8 caractères")
      */
@@ -55,7 +56,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customers_read", "invoices_read", "invoices_subresources"})
+     * @Groups({"customers_read", "invoices_read", "invoices_subresources", "user_read"})
      * @Assert\NotBlank(message="Le prénom est obligatoire")
      * @Assert\Length(min=2, minMessage="Le Prénom doit faire au moins 2 caractères", max=255, maxMessage="Le Prénom ne peut pas faire plus de 255 caractères")
      */
@@ -63,7 +64,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customers_read", "invoices_read", "invoices_subresources"})
+     * @Groups({"customers_read", "invoices_read", "invoices_subresources", "user_read"})
      * @Assert\NotBlank(message="Le nom est obligatoire")
      * @Assert\Length(min=2, minMessage="Le nom doit faire au moins 2 caractères", max=255, maxMessage="Le nom ne peut pas faire plus de 255 caractères")
      */
@@ -121,7 +122,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-        $roles[] = ['ROLE_USER'];
+        $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
     }
